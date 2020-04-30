@@ -6,7 +6,7 @@ interface Balance {
   total: number;
 }
 
-interface TransactionDTO {
+interface TransactionTDO {
   title: string;
   value: number;
   type: 'income' | 'outcome';
@@ -24,10 +24,22 @@ class TransactionsRepository {
   }
 
   public getBalance(): Balance {
-    // TODO
+    const incomeSum = this.transactions
+      .filter(val => val.type === 'income')
+      .map(f => f.value)
+      .reduce((a, b) => a + b, 0);
+
+    const outcomeSum = this.transactions
+      .filter(val => val.type === 'outcome')
+      .map(f => f.value)
+      .reduce((a, b) => a + b, 0);
+
+    const valAvailable = incomeSum - outcomeSum;
+
+    return { income: incomeSum, outcome: outcomeSum, total: valAvailable };
   }
 
-  public create({ title, value, type }: TransactionDTO): Transaction {
+  public create({ title, value, type }: TransactionTDO): Transaction {
     const transaction = new Transaction({ title, value, type });
 
     this.transactions.push(transaction);
